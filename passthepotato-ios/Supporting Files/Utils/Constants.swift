@@ -7,7 +7,10 @@
 
 import Foundation
 import UIKit
-import MapKit
+
+extension UIColor {
+    static let accentColor = UIColor.init(named: "AccentColor")!
+}
 
 struct Constants {
     

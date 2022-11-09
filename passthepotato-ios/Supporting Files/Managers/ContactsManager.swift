@@ -1,0 +1,78 @@
+//
+//  ContactsManager.swift
+//  passthepotato-ios
+//
+//  Created by Adam Novak on 2022/11/09.
+//
+
+import Foundation
+import Contacts
+import UIKit
+
+class ContactsManager {
+    
+    static let contactStore = CNContactStore()
+    
+    //MARK: - Permission
+    
+    static func requestContactsIfNecessary(onController controller: UIViewController, closure: @escaping (_ approved: Bool) -> Void) {
+        let status = CNContactStore.authorizationStatus(for: .contacts)
+        switch status {
+        case .notDetermined:
+            contactStore.requestAccess(for: .contacts) { approved, _ in
+                if approved {
+                    closure(true)
+                } else {
+                    closure(false)
+                }
+            }
+        case .authorized:
+            closure(true)
+        default:
+            AlertManager.showSettingsAlertController(title: "share your contacts in settings", message: "", on: controller) { approved in
+                closure(approved)
+            }
+        }
+    }
+    
+    //MARK: - FetchContacts
+    
+    static func fetchFilteredContacts(partialString: String) -> [CNContact] {
+        do {
+            let predicate: NSPredicate = CNContact.predicateForContacts(matchingName: partialString)
+            let keysToFetch = [CNContactGivenNameKey,
+                               CNContactFamilyNameKey,
+                               CNContactPhoneNumbersKey,
+                               CNContactThumbnailImageDataKey,
+                               CNContactImageDataAvailableKey] as [CNKeyDescriptor]
+            let contacts = try contactStore.unifiedContacts(matching: predicate, keysToFetch: keysToFetch)
+            return contacts
+        } catch {
+            print("Failed to fetch contact, error: \(error)")
+            return []
+        }
+    }
+    
+    static func fetchAllContacts() -> [CNContact] {
+        var contacts = [CNContact]()
+        let keysToFetch = [CNContactGivenNameKey,
+                           CNContactFamilyNameKey,
+                           CNContactPhoneNumbersKey,
+                           CNContactThumbnailImageDataKey,
+                           CNContactImageDataAvailableKey] as [CNKeyDescriptor]
+        let request = CNContactFetchRequest(keysToFetch: keysToFetch)
+        
+        do {
+          try contactStore.enumerateContacts(with: request) {
+              (contact, stop) in
+              // Array containing all unified contacts from everywhere
+              contacts.append(contact)
+          }
+        }
+        catch {
+          print("unable to fetch contacts")
+        }
+        return contacts
+    }
+    
+}

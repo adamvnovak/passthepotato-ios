@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import Contacts
 
 class ChooseFriendViewController: UIViewController {
     
@@ -16,14 +17,22 @@ class ChooseFriendViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var searchBarTextField: UITextField!
+    var passButton: UIButton!
     
     //Data
     var potentialRecipients: [User] = []
+    var filteredRecipients: [User] = []
     var selectedRecipient: User? = nil {
         didSet {
             backButton.isEnabled = selectedRecipient != nil
+            let newButtonTitle = "Pass the potato" + ((selectedRecipient != nil) ? " to " + selectedRecipient!.firstName : "")
+            passButton.setTitle(newButtonTitle, for: .normal)
+            passButton.setTitleColor(selectedRecipient != nil ? .white : .black, for: .normal)
+            passButton.backgroundColor = selectedRecipient != nil ? .accentColor : .white
         }
     }
+    
+    let contactStore = CNContactStore()
     
     //MARK: - Initialization
     
@@ -41,16 +50,32 @@ class ChooseFriendViewController: UIViewController {
         setupTextField()
         
         potentialRecipients = Feederdata.users
+        filterRecipients()
         tableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        //request contacts if they don't already exist
+        handleContactsAccess()
     }
     
     //MARK: - Setup
+    
+    func handleContactsAccess() {
+        ContactsManager.requestContactsIfNecessary(onController: self) { approved in
+            if approved {
+                let allContacts = ContactsManager.fetchAllContacts()
+                self.potentialRecipients = allContacts.compactMap( {
+                    guard let phoneNumber = $0.bestPhoneNumberPretty else { return nil }
+                    return User(id: "", firstName: $0.givenName, lastName: $0.familyName, username: "from contacts", phoneNumber: phoneNumber)
+                })
+            } else {
+                self.navigationController?.popViewController(animated: true)
+            }
+        }
+    }
+    
+    //MARK: - Fetch
     
     func setupTableView() {
         tableView.delegate = self
@@ -68,17 +93,21 @@ class ChooseFriendViewController: UIViewController {
         let toolBar = UIToolbar(frame: CGRect(x: 0.0,
                                               y: 0.0,
                                               width: UIScreen.main.bounds.size.width,
-                                              height: 44.0))//1
+                                              height: 60))//1
         toolBar.barTintColor = .white
         let flexible = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)//2
         let flexibleTwo = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)//2
 
-        let passButton = UIBarButtonItem(title: "Pass The Potato", style: .done, target: target, action: #selector(passButtonPressed))
+        passButton = UIButton(frame: toolBar.bounds)
+        passButton.addTarget(self, action: #selector(passButtonPressed), for: .touchUpInside)
         passButton.tintColor = .black
+        passButton.setTitle("Pass the potato to...", for: .normal)
 //        let customAttributes = [NSAttributedString.Key.font: UIFont(name: Constants.Font.Medium, size: 17)!]
-//        passButton.setTitleTextAttributes(customAttributes, for: .normal)
-                
-        let items = [flexible, passButton, flexibleTwo]
+        passButton.backgroundColor = .white
+        passButton.setTitleColor(.black, for: .normal)
+        
+        let asdf = UIBarButtonItem(customView: passButton!)
+        let items = [flexible, asdf, flexibleTwo]
         toolBar.setItems(items, animated: false)//4
         
         searchBarTextField.inputAccessoryView = toolBar//5
@@ -119,7 +148,8 @@ class ChooseFriendViewController: UIViewController {
 extension ChooseFriendViewController: UITextFieldDelegate {
     
     @IBAction func textFieldEditingChanged(_ sender: UITextField) {
-        handleUpdatedText(query: searchBarTextField.text!)
+        filterRecipients()
+        tableView.reloadData()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -132,8 +162,12 @@ extension ChooseFriendViewController {
     
     //MARK: - Helpers
     
-    func handleUpdatedText(query: String) {
-        tableView.reloadData()
+    func filterRecipients() {
+        let query = searchBarTextField.text!
+        if query.isEmpty { filteredRecipients = potentialRecipients }
+        else {
+            filteredRecipients = potentialRecipients.filter( { ($0.firstName+$0.lastName+$0.username).contains(query) })
+        }
     }
     
 }
@@ -143,12 +177,12 @@ extension ChooseFriendViewController {
 extension ChooseFriendViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        potentialRecipients.count
+        filteredRecipients.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let defaultCell = UITableViewCell(style: .default, reuseIdentifier: "hi")
-        let user = potentialRecipients[indexPath.row]
+        let user = filteredRecipients[indexPath.row]
         print("USER:", user)
         defaultCell.textLabel?.text = user.firstName + " " + user.lastName
         defaultCell.detailTextLabel?.text = "@" + user.username
@@ -159,6 +193,7 @@ extension ChooseFriendViewController: UITableViewDelegate, UITableViewDataSource
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //put that user as the selected recipient
+        selectedRecipient = filteredRecipients[indexPath.row]
     }
     
 }
