@@ -10,12 +10,13 @@ import Contacts
 import UIKit
 
 class ContactsManager {
-    
-    static let contactStore = CNContactStore()
-    
+        
     //MARK: - Permission
     
+    static var allContacts: [CNContact] = []
+    
     static func requestContactsIfNecessary(onController controller: UIViewController, closure: @escaping (_ approved: Bool) -> Void) {
+        let contactStore = CNContactStore()
         let status = CNContactStore.authorizationStatus(for: .contacts)
         switch status {
         case .notDetermined:
@@ -37,7 +38,8 @@ class ContactsManager {
     
     //MARK: - FetchContacts
     
-    static func fetchFilteredContacts(partialString: String) -> [CNContact] {
+    static func fetchFilteredContacts(partialString: String) async -> [CNContact] {
+        let contactStore = CNContactStore()
         do {
             let predicate: NSPredicate = CNContact.predicateForContacts(matchingName: partialString)
             let keysToFetch = [CNContactGivenNameKey,
@@ -53,7 +55,8 @@ class ContactsManager {
         }
     }
     
-    static func fetchAllContacts() -> [CNContact] {
+    static func fetchAllContacts() async {
+        let contactStore = CNContactStore()
         var contacts = [CNContact]()
         let keysToFetch = [CNContactGivenNameKey,
                            CNContactFamilyNameKey,
@@ -72,7 +75,7 @@ class ContactsManager {
         catch {
           print("unable to fetch contacts")
         }
-        return contacts
+        allContacts = contacts
     }
     
 }

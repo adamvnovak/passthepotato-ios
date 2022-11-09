@@ -49,13 +49,10 @@ class ChooseFriendViewController: UIViewController {
         setupTableView()
         setupTextField()
         
-        potentialRecipients = Feederdata.users
+        potentialRecipients = []
         filterRecipients()
         tableView.reloadData()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        
         handleContactsAccess()
     }
     
@@ -64,13 +61,24 @@ class ChooseFriendViewController: UIViewController {
     func handleContactsAccess() {
         ContactsManager.requestContactsIfNecessary(onController: self) { approved in
             if approved {
-                let allContacts = ContactsManager.fetchAllContacts()
-                self.potentialRecipients = allContacts.compactMap( {
-                    guard let phoneNumber = $0.bestPhoneNumberPretty else { return nil }
-                    return User(id: "", firstName: $0.givenName, lastName: $0.familyName, username: "from contacts", phoneNumber: phoneNumber)
-                })
+                Task {
+                    await ContactsManager.fetchAllContacts()
+                    self.potentialRecipients = ContactsManager.allContacts.compactMap( {
+                        guard
+                            let phoneNumber = $0.bestPhoneNumberPretty,
+                            !$0.givenName.isEmpty
+                        else { return nil }
+                        return User(id: "", firstName: $0.givenName, lastName: $0.familyName, username: "from contacts", phoneNumber: phoneNumber)
+                    }).sorted(by: { $0.firstName < $1.firstName })
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        self.filterRecipients()
+                        self.tableView.reloadData()
+                    }
+                }
             } else {
-                self.navigationController?.popViewController(animated: true)
+                DispatchQueue.main.async {
+                    self.navigationController?.popViewController(animated: true)
+                }
             }
         }
     }
@@ -116,17 +124,14 @@ class ChooseFriendViewController: UIViewController {
     //MARK: - Interaction
     
     @objc func passButtonPressed() {
-        
-        print("Meep")
+        guard let selectedRecipient else { return }
         
         //FOR V1: you can only send a potato to those who have the app
         
         //decide to either send them a text or a notification
         
-        let name = "adam"
-        
-        let alert = UIAlertController(title: "potato passed",
-                                      message: "you passed the potato to " + name,
+        let alert = UIAlertController(title: "you passed the potato to " + selectedRecipient.firstName,
+                                      message: "",
                                       preferredStyle: UIAlertController.Style.alert)
 //        alert.view.tintColor = .tintColor
         alert.addAction(UIAlertAction(title: "nice",
@@ -166,7 +171,7 @@ extension ChooseFriendViewController {
         let query = searchBarTextField.text!
         if query.isEmpty { filteredRecipients = potentialRecipients }
         else {
-            filteredRecipients = potentialRecipients.filter( { ($0.firstName+$0.lastName+$0.username).contains(query) })
+            filteredRecipients = potentialRecipients.filter( { ($0.firstName+$0.lastName+$0.username).lowercased().contains(query.lowercased()) })
         }
     }
     

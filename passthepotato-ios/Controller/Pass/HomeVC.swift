@@ -32,6 +32,9 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         reloadUI()
+        
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
