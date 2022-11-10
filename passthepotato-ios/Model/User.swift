@@ -13,6 +13,7 @@ struct User: Codable {
     let lastName: String
     let username: String
     let phoneNumber: String
+    let profilePicPath: String
     
-    static let NilUser: User = User(id: "", firstName: "", lastName: "", username: "", phoneNumber: "11111111111")
+    static let NilUser: User = User(id: "", firstName: "", lastName: "", username: "", phoneNumber: "11111111111", profilePicPath: "")
 }

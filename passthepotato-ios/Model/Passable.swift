@@ -10,5 +10,5 @@ import Foundation
 struct Passable: Codable {
     let id: String
     let emoji: String
-    let passes: [Pass]
+    let passCount: Int
 }

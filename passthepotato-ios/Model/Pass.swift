@@ -10,7 +10,8 @@ import Foundation
 struct Pass: Codable {
     let id: String
     let passableId: String
-    let passer: User
-    let receiver: User
+    let passerId: String
+    let receiverId: String?
+    let receiverPhoneNumber: String?
     let timestamp: Date
 }

@@ -9,6 +9,18 @@ import UIKit
 import FirebaseCore
 import FirebaseMessaging
 
+//APNS Payload characteristics:
+//{
+//  "aps" : {
+//    "alert" : {
+//      "body" : "great match!",
+//      "title" : "Portugal vs. Denmark",
+//    },
+//    "badge" : 1,
+//  },
+//  "customKey" : "customValue"
+//}
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -44,8 +56,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-
 }
+
+//MARK: - Firebase Messaging
 
 extension AppDelegate: MessagingDelegate {
     
@@ -74,7 +87,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
     // These delegate methods MUST live in App Delegate and nowhere else!
     
-    //MARK: - Notifications
+    //MARK: - Notification Registration
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         print("didRegisterForRemoteNotificationsWithDeviceToken")
@@ -90,6 +103,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("didFAILLLLLLToRegisterForRemoteNotificationsWithError")
     }
+        
+    //MARK: - Alert Notifications
     
     //user was not in app
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -106,10 +121,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
         completionHandler()
     }
-    
-//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-//        <#code#>
-//    }
 
     //user was in app
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -162,6 +173,31 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 //        catch {
 //            print("failed to load data after notification:", error.localizedDescription)
 //        }
+    }
+    
+    //MARK: - Background / silent notifications
+    
+//    When sending messages with the content_available key (equivalent to APNs's content-available, the messages will be delivered as silent notifications, waking your app in the background for tasks like background data refresh. Unlike foreground notifications, these notifications must be handled via the function below
+    
+    func application(_ application: UIApplication,
+                     didReceiveRemoteNotification userInfo: [AnyHashable: Any]) async
+      -> UIBackgroundFetchResult {
+      // If you are receiving a notification message while your app is in the background,
+      // this callback will not be fired till the user taps on the notification launching the application.
+      // TODO: Handle data of notification
+
+      // With swizzling disabled you must let Messaging know about the message, for Analytics
+      // Messaging.messaging().appDidReceiveMessage(userInfo)
+
+      // Print message ID.
+//      if let messageID = userInfo[gcmMessageIDKey] {
+//        print("Message ID: \(messageID)")
+//      }
+//
+//      // Print full message.
+//      print(userInfo)
+
+      return UIBackgroundFetchResult.newData
     }
     
 }
