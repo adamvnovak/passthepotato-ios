@@ -30,8 +30,10 @@ class ContactsManager {
         case .authorized:
             closure(true)
         default:
-            AlertManager.showSettingsAlertController(title: "share your contacts in settings", message: "", on: controller) { approved in
-                closure(approved)
+            DispatchQueue.main.async {
+                AlertManager.showSettingsAlertController(title: "share your contacts in settings", message: "", on: controller) { approved in
+                    closure(approved)
+                }
             }
         }
     }

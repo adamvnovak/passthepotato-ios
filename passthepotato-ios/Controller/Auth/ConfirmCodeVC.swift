@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import FirebaseAuth
 
 class ConfirmCodeViewController: KUIViewController, UITextFieldDelegate {
     
@@ -23,10 +24,9 @@ class ConfirmCodeViewController: KUIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var titleTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var sentToLabel: UILabel!
     @IBOutlet weak var confirmTextField: UITextField!
     @IBOutlet weak var continueButton: UIButton!
-    @IBOutlet weak var resendButton: UIButton!
+//    @IBOutlet weak var resendButton: UIButton!
 
     var isValidInput: Bool! {
         didSet {
@@ -37,29 +37,29 @@ class ConfirmCodeViewController: KUIViewController, UITextFieldDelegate {
         didSet {
             continueButton.setTitle(isSubmitting ? "" : "continue", for: .normal)
             continueButton.loadingIndicator(isSubmitting)
-            resendButton.isEnabled = !isSubmitting && resendState == .notsent
+//            resendButton.isEnabled = !isSubmitting && resendState == .notsent
         }
     }
     
 //    let resendAttributes = [NSAttributedString.Key.font: UIFont(name: Constants.Font.Medium, size: 12)!]
-    var resendState: ResendState = .notsent {
-        didSet {
-            switch resendState {
-            case .notsent:
-                resendButton.loadingIndicator(false)
-                resendButton.isEnabled = true
-                resendButton.setTitle("resend", for: .normal)
-            case .sending:
-                resendButton.isEnabled = false
-                resendButton.loadingIndicator(true)
-                resendButton.setTitle("", for: .normal)
-            case .sent:
-                resendButton.isUserInteractionEnabled = false
-                resendButton.loadingIndicator(false)
-                resendButton.setTitle("resent", for: .normal)
-            }
-        }
-    }
+//    var resendState: ResendState = .notsent {
+//        didSet {
+//            switch resendState {
+//            case .notsent:
+//                resendButton.loadingIndicator(false)
+//                resendButton.isEnabled = true
+//                resendButton.setTitle("resend", for: .normal)
+//            case .sending:
+//                resendButton.isEnabled = false
+//                resendButton.loadingIndicator(true)
+//                resendButton.setTitle("", for: .normal)
+//            case .sent:
+//                resendButton.isUserInteractionEnabled = false
+//                resendButton.loadingIndicator(false)
+//                resendButton.setTitle("resent", for: .normal)
+//            }
+//        }
+//    }
     
     //MARK: - Initialization
     
@@ -79,7 +79,6 @@ class ConfirmCodeViewController: KUIViewController, UITextFieldDelegate {
         shouldNotAnimateKUIAccessoryInputView = true
         setupConfirmEmailTextField()
         setupContinueButton()
-        setupLabel()
         confirmTextField.becomeFirstResponder()
         validateInput()
     }
@@ -112,15 +111,11 @@ class ConfirmCodeViewController: KUIViewController, UITextFieldDelegate {
         continueButton.roundCornersViaCornerRadius(radius: 10)
         continueButton.clipsToBounds = true
         continueButton.isEnabled = false
-        continueButton.setBackgroundImage(UIImage.imageFromColor(color: .red), for: .normal)
-        continueButton.setBackgroundImage(UIImage.imageFromColor(color: .red.withAlphaComponent(0.2)), for: .disabled)
-        continueButton.setTitleColor(.white, for: .normal)
+        continueButton.setBackgroundImage(UIImage.imageFromColor(color: .white), for: .normal)
+        continueButton.setBackgroundImage(UIImage.imageFromColor(color: .lightGray.withAlphaComponent(0.7)), for: .disabled)
+        continueButton.setTitleColor(.accentColor, for: .normal)
         continueButton.setTitleColor(.white, for: .disabled)
         continueButton.setTitle("continue", for: .normal)
-    }
-    
-    func setupLabel() {
-        sentToLabel.text! += recipient
     }
     
     //MARK: - User Interaction
@@ -133,17 +128,17 @@ class ConfirmCodeViewController: KUIViewController, UITextFieldDelegate {
         tryToContinue()
     }
     
-    @IBAction func didPressedResendButton(_ sender: UIButton) {
-        resendState = .sending
-        Task {
-            do {
-                try await resend()
-            } catch {
-                handleError(error)
-            }
-            resendState = .sent
-        }
-    }
+//    @IBAction func didPressedResendButton(_ sender: UIButton) {
+//        resendState = .sending
+//        Task {
+//            do {
+//                try await resend()
+//            } catch {
+//                handleError(error)
+//            }
+//            resendState = .sent
+//        }
+//    }
     
     //MARK: - TextField Delegate
     
@@ -197,15 +192,21 @@ class ConfirmCodeViewController: KUIViewController, UITextFieldDelegate {
     func tryToContinue() {
         guard let code = confirmTextField.text else { return }
         isSubmitting = true
-        Task {
-            do {
-                try await validate(validationCode: code)
-                DispatchQueue.main.async {
-                    self.continueToNextScreen()
-                }
-            } catch {
-                handleError(error)
+        AuthContext.verificationCode = code
+        
+        let credential = PhoneAuthProvider.provider().credential(
+            withVerificationID: AuthContext.verificationID,
+            verificationCode: AuthContext.verificationCode
+        )
+        
+        Auth.auth().signIn(with: credential) { authResult, error in
+            if let error = error {
+                self.handleError(error)
+                return
             }
+            // User was validated
+            
+            return
         }
     }
     
@@ -221,12 +222,12 @@ class ConfirmCodeViewController: KUIViewController, UITextFieldDelegate {
     
     //MARK: - ConfirmMethod Functions
     
-    func resend() async throws {
-        switch confirmMethod {
-        case .phoneNumber:
-            break
-        }
-    }
+//    func resend() async throws {
+//        switch confirmMethod {
+//        case .phoneNumber:
+//            break
+//        }
+//    }
     
     func validate(validationCode: String) async throws {
         switch confirmMethod {

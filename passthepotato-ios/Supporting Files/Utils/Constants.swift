@@ -34,7 +34,8 @@ struct Constants {
             static let HomeNav = "HomeNavigationViewController"
             static let ConfirmCode = "ConfirmCodeViewController"
             static let ChooseFriend = "ChooseFriendViewController"
-            static let AuthNavigation = "AuthNavigationViewController"
+            static let AuthNavigation = "AuthNavigationController"
+            static let CreateProfile = "CreateProfileViewController"
         }
         struct Segue {
             

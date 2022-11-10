@@ -10,6 +10,7 @@ import UIKit
 
 class AlertManager {
     
+    @MainActor
     static func showSettingsAlertController(title: String, message: String, on controller: UIViewController, closure: @escaping (_ approved: Bool) -> Void = { approved in } ) {
       let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
 

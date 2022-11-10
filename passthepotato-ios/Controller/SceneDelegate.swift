@@ -10,6 +10,34 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    
+    static var visibleViewController: UIViewController? {
+        get {
+            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let delegate = windowScene.delegate as? SceneDelegate, let window = delegate.window else { return nil }
+            guard let rootVC = window.rootViewController else { return nil }
+            return getVisibleViewController(rootVC)
+        }
+    }
+    
+    static private func getVisibleViewController(_ rootViewController: UIViewController) -> UIViewController? {
+        if let presentedViewController = rootViewController.presentedViewController {
+            return getVisibleViewController(presentedViewController)
+        }
+
+        if let navigationController = rootViewController as? UINavigationController {
+            return navigationController.visibleViewController
+        }
+
+        if let tabBarController = rootViewController as? UITabBarController {
+            if let selectedTabVC = tabBarController.selectedViewController {
+                return getVisibleViewController(selectedTabVC)
+            }
+            return tabBarController
+        }
+
+        return rootViewController
+    }
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -17,6 +45,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
+        
+//        guard let windowScene = scene as? UIWindowScene else { return }
+//        let window = UIWindow(windowScene: windowScene)
+//        self.window = window
+//
+//        if !UserService.singleton.isLoggedIntoAnAccount {
+//            let loadingVC = UIStoryboard(name: "Auth", bundle: nil).instantiateViewController(withIdentifier: Constants.SBID.VC.AuthNavigation) as! UINavigationController
+//            window.rootViewController = loadingVC
+//            window.makeKeyAndVisible()
+//        }
+        
+//        if let notificationResponse = connectionOptions.notificationResponse,
+//           let notificationResponseHandler = generateNotificationResponseHandler(notificationResponse) {
+//            loadingVC.notificationResponseHandler = notificationResponseHandler
+//        }
+        
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

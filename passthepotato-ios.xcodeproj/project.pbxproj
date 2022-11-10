@@ -11,6 +11,8 @@
 		4768FB1F291B45DE00D96B60 /* Feederdata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4768FB1E291B45DE00D96B60 /* Feederdata.swift */; };
 		4768FB21291B966000D96B60 /* ContactsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4768FB20291B966000D96B60 /* ContactsManager.swift */; };
 		4768FB23291B9BA300D96B60 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4768FB22291B9BA300D96B60 /* AlertManager.swift */; };
+		4768FB25291C7D8C00D96B60 /* CreateProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4768FB24291C7D8C00D96B60 /* CreateProfileVC.swift */; };
+		4768FB27291C7E1600D96B60 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4768FB26291C7E1600D96B60 /* ImagePicker.swift */; };
 		47B008FF291B03D000A5662A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47B008FE291B03D000A5662A /* GoogleService-Info.plist */; };
 		47B00902291B046E00A5662A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 47B00901291B046E00A5662A /* FirebaseAnalytics */; };
 		47B00904291B046E00A5662A /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 47B00903291B046E00A5662A /* FirebaseAuth */; };
@@ -142,6 +144,8 @@
 		4768FB1E291B45DE00D96B60 /* Feederdata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feederdata.swift; sourceTree = "<group>"; };
 		4768FB20291B966000D96B60 /* ContactsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsManager.swift; sourceTree = "<group>"; };
 		4768FB22291B9BA300D96B60 /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
+		4768FB24291C7D8C00D96B60 /* CreateProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateProfileVC.swift; sourceTree = "<group>"; };
+		4768FB26291C7E1600D96B60 /* ImagePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		47B008FE291B03D000A5662A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		47B00913291B087800A5662A /* passthepotato-ios.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "passthepotato-ios.entitlements"; sourceTree = "<group>"; };
 		47B00918291B1BEC00A5662A /* Passable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Passable.swift; sourceTree = "<group>"; };
@@ -322,6 +326,7 @@
 			children = (
 				47C16181291AD3A90013D330 /* EnterPhoneNumberVC.swift */,
 				47B00920291B1CFB00A5662A /* ConfirmCodeVC.swift */,
+				4768FB24291C7D8C00D96B60 /* CreateProfileVC.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -585,6 +590,7 @@
 		47B00A1B291B364F00A5662A /* AbstractControllers */ = {
 			isa = PBXGroup;
 			children = (
+				4768FB26291C7E1600D96B60 /* ImagePicker.swift */,
 				47B00A1C291B364F00A5662A /* KUIViewController.swift */,
 			);
 			path = AbstractControllers;
@@ -797,6 +803,7 @@
 				47B009C6291B1D8B00A5662A /* CustomAttributedString.swift in Sources */,
 				47B00A03291B1D8C00A5662A /* String+Condensed.swift in Sources */,
 				47B009D6291B1D8B00A5662A /* UIView+PostBubble.swift in Sources */,
+				4768FB27291C7E1600D96B60 /* ImagePicker.swift in Sources */,
 				47B009ED291B1D8C00A5662A /* UIImageView+Initials.swift in Sources */,
 				47B00919291B1BEC00A5662A /* Passable.swift in Sources */,
 				47C16182291AD3A90013D330 /* EnterPhoneNumberVC.swift in Sources */,
@@ -814,6 +821,7 @@
 				47B009E1291B1D8B00A5662A /* UINavigationItem+UIButton.swift in Sources */,
 				47B00A05291B1D8C00A5662A /* UISearchBar+CenterText.swift in Sources */,
 				47B009AE291B1D8B00A5662A /* BlockAPI.swift in Sources */,
+				4768FB25291C7D8C00D96B60 /* CreateProfileVC.swift in Sources */,
 				4768FB1D291B415800D96B60 /* PassService.swift in Sources */,
 				47B009C4291B1D8B00A5662A /* Validate.swift in Sources */,
 				47B009DB291B1D8B00A5662A /* UIView+TopBorder.swift in Sources */,

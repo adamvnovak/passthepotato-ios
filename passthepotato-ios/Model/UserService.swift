@@ -50,7 +50,7 @@ class UserService: NSObject {
         super.init()
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         localFileLocation = documentsDirectory.appendingPathComponent(LOCAL_FILE_APPENDING_PATH)
-        
+                
         if FileManager.default.fileExists(atPath: localFileLocation.path) {
             self.loadUserFromFilesystem()
             setupFirebaseAnalyticsProperties()

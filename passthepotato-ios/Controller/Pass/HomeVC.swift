@@ -35,6 +35,8 @@ class HomeViewController: UIViewController {
         
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         navigationController?.interactivePopGestureRecognizer?.delegate = self
+        
+        NotificationsManager.shared.askForNewNotificationPermissionsIfNecessary(onVC: self)
     }
     
     override func viewWillAppear(_ animated: Bool) {

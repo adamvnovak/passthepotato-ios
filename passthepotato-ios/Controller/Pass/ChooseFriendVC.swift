@@ -188,7 +188,6 @@ extension ChooseFriendViewController: UITableViewDelegate, UITableViewDataSource
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let defaultCell = UITableViewCell(style: .default, reuseIdentifier: "hi")
         let user = filteredRecipients[indexPath.row]
-        print("USER:", user)
         defaultCell.textLabel?.text = user.firstName + " " + user.lastName
         defaultCell.detailTextLabel?.text = "@" + user.username
         defaultCell.imageView!.image = UIImage(systemName: "magnifyingglass")
